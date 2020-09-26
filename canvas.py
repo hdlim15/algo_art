@@ -1,7 +1,7 @@
 import numpy as np
 
 class Canvas:
-    def __init__(self, height=512, width=1024, data=None):
+    def __init__(self, height=768, width=1024, data=None):
         if data is None:
             data = np.zeros((height, width, 3), dtype=np.uint8)
 
