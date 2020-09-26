@@ -152,24 +152,22 @@ class SlicedCurves(Algorithm):
 
         x = 0
 
-
+        color = random.choice(self.COLORS)
         while x < canvas.width - 1:
-            color = random.choice(self.COLORS)
             steepness = random.randint(-4, 4) * 5
-            # steepness = random.randint(-10, 10)
-            # distance = random.randint(50, 300)
 
-            # distance_covered = 0
+            iterations = random.randint(1, 5)
 
-            if x + abs(steepness) < canvas.width:
-                length = abs(steepness)
-            else:
-                length = canvas.width - x
+            for _ in range(iterations):
+                if x + abs(steepness) < canvas.width:
+                    length = abs(steepness)
+                else:
+                    length = canvas.width - x
 
-            draw_rectangle(start_y, start_y + self.THICKNESS, x, x + length, color, canvas)
+                draw_rectangle(start_y, start_y + self.THICKNESS, x, x + length, color, canvas)
 
-            x += length
-            start_y = start_y + np.sign(steepness) * self.THICKNESS
+                x += length
+                start_y = start_y + np.sign(steepness) * self.THICKNESS
 
 
 
