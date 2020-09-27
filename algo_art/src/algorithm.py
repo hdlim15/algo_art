@@ -1,8 +1,8 @@
 import random
 import numpy as np
 
-from utils import random_pixel, near_pixel, random_grayscale, draw_rectangle
-from colors import *
+from .utils import random_pixel, near_pixel, random_grayscale, draw_rectangle
+from .colors import *
 
 
 class Algorithm:
@@ -19,16 +19,20 @@ class Algorithm:
 
 class RandomPixels(Algorithm):
 
+    name = 'random_pixels'
+
     def run(self):
         for i in range(self.canvas.height):
             for j in range(self.canvas.width):
                 self.canvas.draw_pixel(i, j, random_pixel())
 
     def __str__(self):
-        return 'random_pixels'
+        return self.name
 
 
 class RandomNearPixels(Algorithm):
+
+    name = 'random_near_pixels'
 
     DISTANCE = 15
 
@@ -41,10 +45,12 @@ class RandomNearPixels(Algorithm):
             previous_pixel = self.canvas.data[i, 0]
 
     def __str__(self):
-        return 'random_near_pixels'
+        return self.name
 
 
 class Quadrant(Algorithm):
+
+    name = 'quadrant'
 
     def run(self):
         midpoint_y = self.canvas.height / 2
@@ -64,10 +70,12 @@ class Quadrant(Algorithm):
                         self.canvas.draw_pixel(i, j, WHITE)
 
     def __str__(self):
-        return 'quadrant'
+        return self.name
 
 
 class RandomSpiral(Algorithm):
+    name = 'random_spiral'
+
     DISTANCE = 25
 
     THICKNESS = 15
@@ -111,10 +119,11 @@ class RandomSpiral(Algorithm):
             left_column += self.THICKNESS
 
     def __str__(self):
-        return 'random_spiral'
+        return self.name
 
 
 class GrayscaleRectangles(Algorithm):
+    name = 'grayscale_rectangles'
 
     MAX_LENGTH = 500
     MIN_WIDTH = 5
@@ -145,13 +154,14 @@ class GrayscaleRectangles(Algorithm):
             draw_rectangle(y, y + height, x, x + width, random_gray, self.canvas)
 
     def __str__(self):
-        return 'grayscale_rectangles'
+        return self.name
 
 
 class SlicedCurves(Algorithm):
     """
     https://res.infoq.com/news/2020/01/solandra-typescript-art/en/resources/1lewitt-1577881245947.png
     """
+    name = 'sliced_curves'
 
     COLORS = (RED, BLUE, YELLOW)
 
@@ -196,4 +206,4 @@ class SlicedCurves(Algorithm):
         pass
 
     def __str__(self):
-        return 'sliced_curves'
+        return self.name

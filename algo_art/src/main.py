@@ -1,22 +1,16 @@
 import argparse
 
-from canvas import Canvas
-from algorithm import *
-from painting import Painting
+from .canvas import Canvas
+from .algorithm import Algorithm
+from .painting import Painting
 
 
-ALGORITHM_MAP = {
-    'random_pixels': RandomPixels,
-    'random_near_pixels': RandomNearPixels,
-    'quadrant': Quadrant,
-    'random_spiral': RandomSpiral,
-    'grayscale_rectangles': GrayscaleRectangles,
-    'sliced_curves': SlicedCurves,
-}
+ALGORITHM_MAP = {str(algo): algo for algo in Algorithm.__subclasses__()}
 
 
 
 def main():
+    import ipdb;ipdb.set_trace()
     parser = argparse.ArgumentParser()
 
     parser.add_argument("-a", "--algorithm", help="Algorithm name")
