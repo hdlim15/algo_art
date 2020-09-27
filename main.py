@@ -30,9 +30,9 @@ def main():
         print(f'Could not find algorithm {args.algorithm}')
         exit(1)
 
-    algorithm = ALGORITHM_MAP[args.algorithm]()
     canvas = Canvas(args.height, args.width)
-    painting = Painting(canvas, algorithm, args.seed)
+    algorithm = ALGORITHM_MAP[args.algorithm](canvas)
+    painting = Painting(algorithm, args.seed)
     painting.paint()
 
 

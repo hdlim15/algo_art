@@ -46,9 +46,3 @@ def draw_rectangle(y0, y1, x0, x1, color, canvas):
     for i in range(inbounds_y(y0, canvas), inbounds_y(y1, canvas)):
         for j in range(inbounds_x(x0, canvas), inbounds_x(x1, canvas)):
             canvas.draw_pixel(i, j, color)
-
-
-
-
-
-
