@@ -1,6 +1,43 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h1>Home</h1>
-  {{ algorithms }}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            console.log('ran script');
+            console.log($("#idForm"));
+            $("#idForm").submit(function(e) {
+                console.log('submitted');
+
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+
+                var form = $(this);
+                var url = form.attr('action');
+                var d = new Date();
+
+                $.ajax({
+                   type: "POST",
+                   url: url,
+                   data: form.serialize(), // serializes the form's elements.
+                   success: function()
+                   {
+                        painting = $("#tmp_painting");
+                        console.log(painting);
+                        $("#tmp_painting").attr("src", "{{ url_for('static', filename='tmp_painting.png') }}" + "?nocache=" +  d.getTime());
+                   }
+                });
+            });
+        });
+    </script>
+
+    <form action={{ url_for('.home') }} method="post" id="idForm">
+      <select name="algo" id="algo">
+        {% for algo in algorithms %}
+            <option value={{ algo }}>{{ algo }}</option>
+        {% endfor %}
+      </select>
+      <br><br>
+      <input type="submit" value="Submit">
+    </form>
+    <img id="tmp_painting">
 {% endblock %}

@@ -1,6 +1,8 @@
-from os import mkdir
+from os import mkdir, path, remove
 from PIL import Image
+from flask import send_file
 import random
+from io import StringIO
 
 class Painting:
     def __init__(self, algorithm, seed=None):
@@ -12,9 +14,14 @@ class Painting:
     def paint(self):
         self.algorithm.run()
         image = Image.fromarray(self.algorithm.canvas.data)
-        self.save_painting_to_file(image)
+        return self.save_painting_to_file(image)
 
-    def save_painting_to_file(self, image):
+    def save_painting_to_file(self, image, save=False):
+        if not save:
+            remove(path.abspath('algo_art/static/tmp_painting.png'))
+            image.save(path.abspath('algo_art/static/tmp_painting.png'))
+            return
+
         try:
             mkdir(f'paintings/{self.algorithm}')
         except FileExistsError:

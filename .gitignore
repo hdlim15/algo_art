@@ -1,2 +1,4 @@
 *.pyc
 __pycache__/
+
+algo_art/static/tmp_painting.png
