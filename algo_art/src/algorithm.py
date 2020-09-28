@@ -129,7 +129,7 @@ class GrayscaleRectangles(Algorithm):
     MIN_WIDTH = 5
     MAX_WIDTH = 15
 
-    PERCENT_VERTICAL = 0.3
+    PERCENT_VERTICAL = 0.4
 
     NUM_RECTANGLES = 30
 
@@ -146,8 +146,8 @@ class GrayscaleRectangles(Algorithm):
                 width, height = height, width
 
             # determine the starting point of the rectangle
-            y = random.randint(0, self.canvas.height) - self.canvas.height // 2
-            x = random.randint(0, self.canvas.width) - self.canvas.width // 2
+            y = random.randint(-self.canvas.height / 4, self.canvas.height)
+            x = random.randint(-self.canvas.width / 4, self.canvas.width)
 
             # draw the rectangle
             random_gray = random_grayscale()
