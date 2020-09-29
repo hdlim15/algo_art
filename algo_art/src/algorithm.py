@@ -3,6 +3,7 @@ import numpy as np
 
 from .utils import random_pixel, near_pixel, random_grayscale, draw_rectangle
 from .colors import *
+from .palettes import *
 
 
 class Algorithm:
@@ -12,19 +13,6 @@ class Algorithm:
 
     def run(self):
         raise NotImplementedError
-
-    def __str__(self):
-        raise NotImplementedError
-
-
-class RandomPixels(Algorithm):
-
-    name = 'random_pixels'
-
-    def run(self):
-        for i in range(self.canvas.height):
-            for j in range(self.canvas.width):
-                self.canvas.draw_pixel(i, j, random_pixel())
 
     def __str__(self):
         return self.name
@@ -43,34 +31,6 @@ class RandomNearPixels(Algorithm):
             for j in range(self.canvas.width):
                 self.canvas.draw_pixel(i, j, near_pixel(previous_pixel, self.DISTANCE))
             previous_pixel = self.canvas.data[i, 0]
-
-    def __str__(self):
-        return self.name
-
-
-class Quadrant(Algorithm):
-
-    name = 'quadrant'
-
-    def run(self):
-        midpoint_y = self.canvas.height / 2
-        midpoint_x = self.canvas.width / 2
-
-        for i in range(self.canvas.height):
-            for j in range(self.canvas.width):
-                if i < midpoint_y:
-                    if j < midpoint_x:
-                        self.canvas.draw_pixel(i, j, RED)
-                    else:
-                        self.canvas.draw_pixel(i, j, GREEN)
-                else:
-                    if j < midpoint_x:
-                        self.canvas.draw_pixel(i, j, BLUE)
-                    else:
-                        self.canvas.draw_pixel(i, j, WHITE)
-
-    def __str__(self):
-        return self.name
 
 
 class RandomSpiral(Algorithm):
@@ -118,9 +78,6 @@ class RandomSpiral(Algorithm):
 
             left_column += self.THICKNESS
 
-    def __str__(self):
-        return self.name
-
 
 class GrayscaleRectangles(Algorithm):
     name = 'grayscale_rectangles'
@@ -151,10 +108,7 @@ class GrayscaleRectangles(Algorithm):
 
             # draw the rectangle
             random_gray = random_grayscale()
-            draw_rectangle(y, y + height, x, x + width, random_gray, self.canvas)
-
-    def __str__(self):
-        return self.name
+            draw_rectangle(y, x, height, width, random_gray, self.canvas)
 
 
 class SlicedCurves(Algorithm):
@@ -183,8 +137,8 @@ class SlicedCurves(Algorithm):
 
         x = 0
 
-        color = random.choice(self.COLORS)
         while x < self.canvas.width - 1:
+            color = random.choice(self.COLORS)
             steepness = random.randint(-4, 4) * 5
 
             iterations = random.randint(1, 5)
@@ -195,7 +149,7 @@ class SlicedCurves(Algorithm):
                 else:
                     length = self.canvas.width - x
 
-                draw_rectangle(start_y, start_y + self.THICKNESS, x, x + length, color, self.canvas)
+                draw_rectangle(start_y, x, self.THICKNESS, length, color, self.canvas)
 
                 x += length
                 start_y = start_y + np.sign(steepness) * self.THICKNESS
@@ -205,5 +159,111 @@ class SlicedCurves(Algorithm):
     def slice_vertically(self):
         pass
 
-    def __str__(self):
-        return self.name
+
+class RecursiveSquares(Algorithm):
+    name = 'recursive_squares'
+
+    COLORS = PALETTE_4
+    NUM_BIG_SQUARES = 6
+
+    def validate_point(self, y, x):
+        for square in self.covered_space:
+            if (
+                y >= square[0] - 1
+                and y <= square[0] + square[2] + 1
+                and x >= square[1] - 1
+                and x <= square[1] + square[2] + 1
+            ):
+                return False
+
+        return True
+
+    def draw_square(self, start_y, start_x, length, color):
+        if (
+            not self.validate_point(start_y, start_x)
+            or not self.validate_point(start_y + length, start_x)
+            or not self.validate_point(start_y, start_x + length)
+            or not self.validate_point(start_y + length, start_x + length)
+        ):
+            return False
+
+        draw_rectangle(start_y, start_x, length, length, color, self.canvas)
+        self.covered_space.append([start_y, start_x, length])
+        return True
+
+    def run(self):
+        LARGEST_SIDE = 100
+
+        height = self.canvas.height
+        width = self.canvas.width
+
+        self.covered_space = []
+
+        self.canvas.set_background(self.COLORS[0])
+
+        y_offset = (height - (height // LARGEST_SIDE * LARGEST_SIDE)) // 2
+        x_offset = (width - (width // LARGEST_SIDE * LARGEST_SIDE)) // 2
+
+        if y_offset < LARGEST_SIDE / 2:
+            y_offset += LARGEST_SIDE // 2
+
+        if x_offset < LARGEST_SIDE / 2:
+            x_offset += LARGEST_SIDE // 2
+
+        # Draw the four large squares in the corners
+        # self.draw_square(y_offset, x_offset, LARGEST_SIDE, self.COLORS[1])
+        # self.draw_square(y_offset, width - (x_offset + LARGEST_SIDE), LARGEST_SIDE, self.COLORS[3])
+        # self.draw_square(height - (y_offset + LARGEST_SIDE), x_offset, LARGEST_SIDE, self.COLORS[2])
+        # self.draw_square(height - (y_offset + LARGEST_SIDE), width - (x_offset + LARGEST_SIDE), LARGEST_SIDE, self.COLORS[4])
+
+        drawn = 0
+        while drawn < 4:
+            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE)
+            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE)
+
+            success = self.draw_square(start_y, start_x, LARGEST_SIDE, self.COLORS[drawn % 4 + 1])
+
+            if success:
+                drawn += 1
+
+
+        # next smallest squares
+        drawn = 0
+        while drawn < 14:
+            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 2)
+            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 2)
+
+            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 2, self.COLORS[drawn % 4 + 1])
+
+            if success:
+                drawn += 1
+
+        drawn = 0
+        while drawn < 50:
+            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 4)
+            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 4)
+
+            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 4, self.COLORS[drawn % 4 + 1])
+
+            if success:
+                drawn += 1
+
+        drawn = 0
+        while drawn < 50:
+            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 8)
+            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 8)
+
+            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 8, self.COLORS[drawn % 4 + 1])
+
+            if success:
+                drawn += 1
+
+        drawn = 0
+        while drawn < 100:
+            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 16)
+            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 16)
+
+            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 16, self.COLORS[drawn % 4 + 1])
+
+            if success:
+                drawn += 1

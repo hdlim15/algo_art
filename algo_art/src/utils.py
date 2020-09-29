@@ -42,7 +42,7 @@ def near_pixel(pixel, distance):
     return [new_red, new_green, new_blue]
 
 
-def draw_rectangle(y0, y1, x0, x1, color, canvas):
-    for i in range(inbounds_y(y0, canvas), inbounds_y(y1, canvas)):
-        for j in range(inbounds_x(x0, canvas), inbounds_x(x1, canvas)):
+def draw_rectangle(start_y, start_x, height, width, color, canvas):
+    for i in range(inbounds_y(start_y, canvas), inbounds_y(start_y + height, canvas)):
+        for j in range(inbounds_x(start_x, canvas), inbounds_x(start_x + width, canvas)):
             canvas.draw_pixel(i, j, color)
