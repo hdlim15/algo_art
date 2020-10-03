@@ -17,7 +17,7 @@
                    success: function()
                    {
                         var d = new Date();
-                        var painting_src = "{{ url_for('static', filename='tmp_painting.png') }}" + "?nocache=" +  d.getTime()
+                        var painting_src = "{{ url_for('static', filename='tmp_painting.png') }}" + "?nocache=" +  d.getTime();
                         $("#tmp_painting").attr("src", painting_src);
                    }
                 });

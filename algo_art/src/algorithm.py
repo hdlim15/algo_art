@@ -164,15 +164,14 @@ class RecursiveSquares(Algorithm):
     name = 'recursive_squares'
 
     COLORS = PALETTE_4
-    NUM_BIG_SQUARES = 6
 
     def validate_point(self, y, x):
         for square in self.covered_space:
             if (
-                y >= square[0] - 1
-                and y <= square[0] + square[2] + 1
-                and x >= square[1] - 1
-                and x <= square[1] + square[2] + 1
+                y >= square[0] - 3
+                and y <= square[0] + square[2] + 3
+                and x >= square[1] - 3
+                and x <= square[1] + square[2] + 3
             ):
                 return False
 
@@ -192,78 +191,41 @@ class RecursiveSquares(Algorithm):
         return True
 
     def run(self):
-        LARGEST_SIDE = 100
-
         height = self.canvas.height
         width = self.canvas.width
 
+        LARGEST_SIDE = min(height, width) // 7
+        NUM_SQUARES = [4, 14, 50, 50, 100]
+
+        # Set the background color. No squares have yet been drawn
+        self.canvas.set_background(self.COLORS[0])
         self.covered_space = []
 
-        self.canvas.set_background(self.COLORS[0])
-
+        # Calculate the offset from the top and bottom so that the squares all fit neatly on their grids
         y_offset = (height - (height // LARGEST_SIDE * LARGEST_SIDE)) // 2
         x_offset = (width - (width // LARGEST_SIDE * LARGEST_SIDE)) // 2
 
+        # Readjust offset if it's too small
         if y_offset < LARGEST_SIDE / 2:
             y_offset += LARGEST_SIDE // 2
 
         if x_offset < LARGEST_SIDE / 2:
             x_offset += LARGEST_SIDE // 2
 
-        # Draw the four large squares in the corners
-        # self.draw_square(y_offset, x_offset, LARGEST_SIDE, self.COLORS[1])
-        # self.draw_square(y_offset, width - (x_offset + LARGEST_SIDE), LARGEST_SIDE, self.COLORS[3])
-        # self.draw_square(height - (y_offset + LARGEST_SIDE), x_offset, LARGEST_SIDE, self.COLORS[2])
-        # self.draw_square(height - (y_offset + LARGEST_SIDE), width - (x_offset + LARGEST_SIDE), LARGEST_SIDE, self.COLORS[4])
 
-        drawn = 0
-        while drawn < 4:
-            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE)
-            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE)
+        for index, num_squares in enumerate(NUM_SQUARES):
+            drawn = 0
+            side_length = LARGEST_SIDE // (2 ** index)
 
-            success = self.draw_square(start_y, start_x, LARGEST_SIDE, self.COLORS[drawn % 4 + 1])
+            while drawn < num_squares:
+                start_y = random.randrange(y_offset, height - y_offset - side_length, side_length)
+                start_x = random.randrange(x_offset, width - x_offset - side_length, side_length)
 
-            if success:
-                drawn += 1
+                success = self.draw_square(start_y, start_x, side_length, self.COLORS[drawn % 4 + 1])
 
-
-        # next smallest squares
-        drawn = 0
-        while drawn < 14:
-            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 2)
-            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 2)
-
-            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 2, self.COLORS[drawn % 4 + 1])
-
-            if success:
-                drawn += 1
-
-        drawn = 0
-        while drawn < 50:
-            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 4)
-            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 4)
-
-            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 4, self.COLORS[drawn % 4 + 1])
-
-            if success:
-                drawn += 1
-
-        drawn = 0
-        while drawn < 50:
-            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 8)
-            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 8)
-
-            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 8, self.COLORS[drawn % 4 + 1])
-
-            if success:
-                drawn += 1
-
-        drawn = 0
-        while drawn < 100:
-            start_y = random.randrange(y_offset, height - y_offset, LARGEST_SIDE // 16)
-            start_x = random.randrange(x_offset, width - x_offset, LARGEST_SIDE // 16)
-
-            success = self.draw_square(start_y, start_x, LARGEST_SIDE // 16, self.COLORS[drawn % 4 + 1])
-
-            if success:
-                drawn += 1
+                if success:
+                    if start_x + side_length > 1020:
+                        print(start_x)
+                        print(side_length)
+                        print(index)
+                    drawn += 1
